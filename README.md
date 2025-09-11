@@ -1,4 +1,4 @@
-# Gist Makefiles - Advanced Makefile System
+# Modular Make - Advanced Makefile System
 
 A comprehensive, modular Makefile system designed to simplify and standardize build automation across projects. This repository provides a reusable framework with color-coded output, automatic target discovery, dependency management, and built-in help system.
 
