@@ -1,0 +1,76 @@
+# Example Makefile System Dependencies
+# Copy this file to .make-deps and customize for your project
+# Format: command:description:level
+# level can be: required, recommended, optional
+
+# === Core Build Tools ===
+make:GNU Make build tool:required
+git:Version control system:required
+bash:Bash shell:required
+
+# === Container Tools ===
+docker:Docker container runtime:required
+docker-compose:Docker Compose for multi-container apps:recommended
+podman:Alternative container runtime:optional
+
+# === Kubernetes Tools ===
+kubectl:Kubernetes command-line tool:required
+helm:Kubernetes package manager:recommended
+kustomize:Kubernetes configuration management:optional
+k9s:Kubernetes cluster CLI manager:optional
+kubectx:Kubernetes context switcher:optional
+
+# === Cloud Provider CLIs ===
+aws:Amazon Web Services CLI:optional
+gcloud:Google Cloud Platform CLI:optional
+az:Microsoft Azure CLI:optional
+doctl:DigitalOcean CLI:optional
+
+# === Development Tools ===
+curl:HTTP client for API testing:recommended
+jq:JSON processor for parsing responses:recommended
+yq:YAML processor and validator:optional
+httpie:Modern HTTP client:optional
+wget:Network downloader:optional
+
+# === Programming Languages ===
+python3:Python 3 runtime:optional
+pip3:Python package manager:optional
+node:Node.js JavaScript runtime:optional
+npm:Node package manager:optional
+go:Go programming language:optional
+rust:Rust programming language:optional
+java:Java runtime environment:optional
+
+# === Testing Tools ===
+pytest:Python testing framework:optional
+jest:JavaScript testing framework:optional
+postman:API testing tool:optional
+
+# === Security Tools ===
+trivy:Container vulnerability scanner:recommended
+cosign:Container signing tool:optional
+syft:Software bill of materials generator:optional
+grype:Vulnerability scanner:optional
+
+# === CI/CD Tools ===
+gh:GitHub CLI:optional
+gitlab:GitLab CLI:optional
+jenkins:Jenkins CLI:optional
+terraform:Infrastructure as Code tool:optional
+ansible:Configuration management:optional
+
+# === Database Tools ===
+psql:PostgreSQL client:optional
+mysql:MySQL client:optional
+mongosh:MongoDB shell:optional
+redis-cli:Redis client:optional
+
+# === Monitoring Tools ===
+prometheus:Monitoring system:optional
+grafana:Visualization platform:optional
+
+# === Documentation Tools ===
+mkdocs:Documentation generator:optional
+swagger:API documentation:optional
+pandoc:Document converter:optional
