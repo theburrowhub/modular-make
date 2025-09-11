@@ -47,7 +47,7 @@ This Makefile system provides a scalable, maintainable approach to project autom
 
 1. **Clone this repository**:
    ```bash
-   git clone https://github.com/yourusername/gist-makefiles.git /tmp/gist-makefiles
+   git clone https://github.com/theburrowhub/modular-make.git /tmp/gist-makefiles
    ```
 
 2. **Copy to your project**:
@@ -133,7 +133,7 @@ make start     # Runs your new target
 
 1. **Clone or download** this repository:
    ```bash
-   git clone https://github.com/yourusername/gist-makefiles.git
+   git clone https://github.com/theburrowhub/modular-make.git
    cd gist-makefiles
    ```
 
@@ -167,7 +167,7 @@ make start     # Runs your new target
 
 ```bash
 cd /path/to/your/project
-git submodule add https://github.com/yourusername/gist-makefiles.git .make-system
+git submodule add https://github.com/theburrowhub/modular-make.git .make-system
 ln -s .make-system/Makefile Makefile
 ln -s .make-system/.make .make
 ```
