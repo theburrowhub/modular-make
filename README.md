@@ -47,14 +47,14 @@ This Makefile system provides a scalable, maintainable approach to project autom
 
 1. **Clone this repository**:
    ```bash
-   git clone https://github.com/theburrowhub/modular-make.git /tmp/gist-makefiles
+   git clone https://github.com/theburrowhub/modular-make.git /tmp/modular-make
    ```
 
 2. **Copy to your project**:
    ```bash
    cd your-project
-   cp -r /tmp/gist-makefiles/.make .
-   cp /tmp/gist-makefiles/Makefile .
+   cp -r /tmp/modular-make/.make .
+   cp /tmp/modular-make/Makefile .
    ```
 
 3. **Test it works**:
@@ -71,8 +71,8 @@ Want to see examples in action? Copy some sample modules:
 
 ```bash
 # Copy example modules (adjust as needed)
-cp -r /tmp/gist-makefiles/docker .
-cp -r /tmp/gist-makefiles/test .
+cp -r /tmp/modular-make/docker .
+cp -r /tmp/modular-make/test .
 ```
 
 Then try:
@@ -134,7 +134,7 @@ make start     # Runs your new target
 1. **Clone or download** this repository:
    ```bash
    git clone https://github.com/theburrowhub/modular-make.git
-   cd gist-makefiles
+   cd modular-make
    ```
 
 2. **Copy the system files** to your project:
