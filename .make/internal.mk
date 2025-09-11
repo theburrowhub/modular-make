@@ -10,7 +10,7 @@ utils: ## Show all system utilities
 	@echo ""
 	@awk 'BEGIN {FS = ":.*##"; section=""} \
 		/^##@/ { section = substr($$0, 5); printf "\n${YELLOW}%s:${NC}\n", section; next } \
-		/^[a-zA-Z_0-9-]+:.*?##/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' internal.mk
+		/^[a-zA-Z_0-9-]+:.*?##/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' .make/internal.mk
 	@echo ""
 	@echo "${CYAN}Use any of these utilities directly, e.g., 'make info'${NC}"
 
@@ -65,32 +65,32 @@ list-marked: ## List only marked targets from all Makefiles
 	done
 
 deps-init: ## Initialize dependencies file from example
-	@if [ -f .make-deps ]; then \
-		echo "${YELLOW}⚠️  .make-deps already exists. Use 'make deps-edit' to modify it.${NC}"; \
-		echo "    To reset, delete .make-deps first: rm .make-deps"; \
+	@if [ -f .make/.make-deps ]; then \
+		echo "${YELLOW}⚠️  .make/.make-deps already exists. Use 'make deps-edit' to modify it.${NC}"; \
+		echo "    To reset, delete .make/.make-deps first: rm .make/.make-deps"; \
 	else \
-		if [ -f .make-deps.example ]; then \
-			cp .make-deps.example .make-deps; \
-			echo "${GREEN}✅ Created .make-deps from example file${NC}"; \
+		if [ -f .make/.make-deps.example ]; then \
+			cp .make/.make-deps.example .make/.make-deps; \
+			echo "${GREEN}✅ Created .make/.make-deps from example file${NC}"; \
 			echo "    Edit it with: make deps-edit"; \
 		else \
-			echo "${YELLOW}Creating basic .make-deps file...${NC}"; \
-			echo "# Project Dependencies" > .make-deps; \
-			echo "make:GNU Make:required" >> .make-deps; \
-			echo "docker:Docker:recommended" >> .make-deps; \
-			echo "kubectl:Kubernetes CLI:recommended" >> .make-deps; \
-			echo "${GREEN}✅ Created basic .make-deps file${NC}"; \
+			echo "${YELLOW}Creating basic .make/.make-deps file...${NC}"; \
+			echo "# Project Dependencies" > .make/.make-deps; \
+			echo "make:GNU Make:required" >> .make/.make-deps; \
+			echo "docker:Docker:recommended" >> .make/.make-deps; \
+			echo "kubectl:Kubernetes CLI:recommended" >> .make/.make-deps; \
+			echo "${GREEN}✅ Created basic .make/.make-deps file${NC}"; \
 		fi \
 	fi
 
 deps-edit: ## Edit the dependencies configuration file
-	@$${EDITOR:-vi} .make-deps
+	@$${EDITOR:-vi} .make/.make-deps
 
 deps-show: ## Show the dependencies configuration
-	@echo "${CYAN}Dependencies Configuration (.make-deps):${NC}"
+	@echo "${CYAN}Dependencies Configuration (.make/.make-deps):${NC}"
 	@echo ""
-	@if [ -f .make-deps ]; then \
-		cat .make-deps | while IFS= read -r line; do \
+	@if [ -f .make/.make-deps ]; then \
+		cat .make/.make-deps | while IFS= read -r line; do \
 			if [ -z "$$line" ]; then \
 				echo ""; \
 			elif [ "$${line:0:1}" = "#" ]; then \
@@ -100,20 +100,20 @@ deps-show: ## Show the dependencies configuration
 			fi; \
 		done; \
 	else \
-		echo "${YELLOW}No .make-deps file found${NC}"; \
+		echo "${YELLOW}No .make/.make-deps file found${NC}"; \
 	fi
 
-check-deps: ## Check required dependencies from .make-deps file
+check-deps: ## Check required dependencies from .make/.make-deps file
 	@echo "${BLUE}🔍 Checking dependencies...${NC}"
 	@echo ""
 	@# Check if dependencies file exists
-	@if [ ! -f .make-deps ]; then \
-		echo "${YELLOW}⚠️  Dependencies file '.make-deps' not found${NC}"; \
+	@if [ ! -f .make/.make-deps ]; then \
+		echo "${YELLOW}⚠️  Dependencies file '.make/.make-deps' not found${NC}"; \
 		echo "Creating default dependencies file..."; \
-		echo "# Add your dependencies here" > .make-deps; \
-		echo "make:GNU Make:required" >> .make-deps; \
-		echo "docker:Docker container runtime:recommended" >> .make-deps; \
-		echo "kubectl:Kubernetes CLI:recommended" >> .make-deps; \
+		echo "# Add your dependencies here" > .make/.make-deps; \
+		echo "make:GNU Make:required" >> .make/.make-deps; \
+		echo "docker:Docker container runtime:recommended" >> .make/.make-deps; \
+		echo "kubectl:Kubernetes CLI:recommended" >> .make/.make-deps; \
 	fi
 	@# Parse and check each dependency
 	@required_missing=0; recommended_missing=0; \
@@ -128,7 +128,7 @@ check-deps: ## Check required dependencies from .make-deps file
 				required_missing=$$((required_missing + 1)); \
 			fi; \
 		fi; \
-	done < .make-deps; \
+	done < .make/.make-deps; \
 	echo ""; \
 	echo "${YELLOW}Recommended:${NC}"; \
 	while IFS=: read -r cmd desc level || [ -n "$$cmd" ]; do \
@@ -141,7 +141,7 @@ check-deps: ## Check required dependencies from .make-deps file
 				recommended_missing=$$((recommended_missing + 1)); \
 			fi; \
 		fi; \
-	done < .make-deps; \
+	done < .make/.make-deps; \
 	echo ""; \
 	echo "${YELLOW}Optional:${NC}"; \
 	while IFS=: read -r cmd desc level || [ -n "$$cmd" ]; do \
@@ -153,7 +153,7 @@ check-deps: ## Check required dependencies from .make-deps file
 				echo "  ${CYAN}○${NC} $$desc ($$cmd) - not installed"; \
 			fi; \
 		fi; \
-	done < .make-deps; \
+	done < .make/.make-deps; \
 	echo ""; \
 	if [ $$required_missing -gt 0 ]; then \
 		echo "${RED}⚠️  Missing $$required_missing required dependencies!${NC}"; \
