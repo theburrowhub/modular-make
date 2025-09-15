@@ -15,6 +15,7 @@ A comprehensive, modular Makefile system designed to simplify and standardize bu
 - [Color System](#color-system)
 - [Project Structure](#project-structure)
 - [Customization](#customization)
+  - [Excluding Directories with .makeignore](#excluding-directories-with-makeignore)
 
 ## Overview
 
@@ -34,6 +35,7 @@ This Makefile system provides a scalable, maintainable approach to project autom
 - 🎨 **Color-coded output** for better readability
 - 📚 **Self-documenting** targets with inline help
 - 🔍 **Automatic subdirectory discovery** and inclusion
+- 🚫 **Directory exclusion** via `.makeignore` patterns
 - 🏷️ **Target categorization** with section headers
 - 📋 **Multiple help levels** (quick help, full help with examples)
 - 🔧 **Dependency checking** system
@@ -394,7 +396,9 @@ your-project/
 │   ├── colors.mk           # Centralized color definitions
 │   ├── internal.mk         # System utilities and tools
 │   ├── .make-deps          # Dependency configuration
-│   └── .make-deps.example  # Example dependency template
+│   ├── .make-deps.example  # Example dependency template
+│   ├── .makeignore         # Directory exclusion patterns
+│   └── .makeignore.example # Example ignore patterns
 ├── docker/
 │   └── Makefile            # Docker-specific targets
 ├── deploy/
@@ -408,10 +412,11 @@ your-project/
 ### How It Works
 
 1. **Main Makefile** automatically discovers subdirectories with Makefiles
-2. **Subdirectory Makefiles** are included and their targets become available
-3. **Color definitions** are shared across all Makefiles
-4. **System utilities** provide maintenance and inspection capabilities
-5. **Help system** automatically extracts documentation from comments
+2. **`.makeignore` patterns** filter out excluded directories from discovery
+3. **Subdirectory Makefiles** are included and their targets become available
+4. **Color definitions** are shared across all Makefiles
+5. **System utilities** provide maintenance and inspection capabilities
+6. **Help system** automatically extracts documentation from comments
 
 ## Customization
 
@@ -440,6 +445,140 @@ EOF
 ```
 
 The targets will be automatically discovered and included.
+
+### Excluding Directories with .makeignore
+
+The `.makeignore` file allows you to exclude specific directories from the automatic Makefile discovery system. This is useful when you have directories containing Makefiles that should not be included in the main build system.
+
+#### When to Use .makeignore
+
+Use `.makeignore` to exclude:
+- **Test directories** with their own independent test runners
+- **Example/demo directories** containing sample Makefiles
+- **Vendor/third-party code** with their own build systems
+- **Experimental or WIP directories** not ready for integration
+- **Backup or deprecated directories** with old Makefiles
+- **Template directories** containing Makefile templates
+
+#### Setting Up .makeignore
+
+1. **Initialize from the example file**:
+   ```bash
+   make ignore-init
+   ```
+   This creates `.make/.makeignore` from the provided example template.
+
+2. **Edit the ignore patterns**:
+   ```bash
+   make edit-ignore
+   # or manually edit .make/.makeignore
+   ```
+
+3. **View currently ignored directories**:
+   ```bash
+   make list-ignored
+   ```
+
+#### .makeignore File Format
+
+The `.makeignore` file uses a simple pattern format:
+```bash
+# Comments start with #
+# One pattern per line
+# Empty lines are ignored
+
+# Exact directory names
+vendor
+examples
+deprecated
+
+# Patterns with wildcards
+test-*        # Matches test-unit, test-integration, etc.
+*-old         # Matches any directory ending with -old
+*-backup      # Matches any directory ending with -backup
+
+# Project-specific ignores
+ignored-folder
+experimental
+```
+
+#### Pattern Rules
+
+- **One pattern per line** - Each line represents a single exclusion pattern
+- **Comments** - Lines starting with `#` are treated as comments
+- **Wildcards** - Use `*` for shell glob patterns (e.g., `test-*`, `*-backup`)
+- **Case-sensitive** - Patterns are case-sensitive by default
+- **Relative paths** - Patterns match directory names relative to project root
+- **No need for common directories** - Don't include `.git`, `node_modules`, etc., as they won't contain Makefiles
+
+#### Example .makeignore
+
+```bash
+# Testing directories (have their own test runners)
+test
+tests
+e2e-tests
+
+# Documentation examples
+examples
+demos
+samples
+
+# Work in progress
+wip
+experimental
+sandbox
+
+# Vendor code
+vendor
+third-party
+external
+
+# Backup and deprecated
+backup
+*-old
+*-deprecated
+archive
+
+# Environment-specific
+*-dev
+*-staging
+*-prod
+```
+
+#### Utilities for .makeignore
+
+The system provides several utilities for managing ignored directories:
+
+```bash
+# Initialize .makeignore from template
+make ignore-init
+
+# Edit the .makeignore file
+make edit-ignore
+
+# Show current ignore patterns and affected directories
+make list-ignored
+
+# List all subdirectories (shows which ones are excluded)
+make list-subdirs
+```
+
+#### How It Works
+
+1. The main Makefile reads `.make/.makeignore` during initialization
+2. Directory discovery filters out any directories matching the patterns
+3. Excluded directories' Makefiles are not included in the build system
+4. Targets from ignored directories remain independent and isolated
+
+#### Best Practices
+
+- **Start with the example** - Use `make ignore-init` to get a comprehensive starting template
+- **Document your patterns** - Add comments explaining why directories are excluded
+- **Be specific** - Use exact names when possible, patterns only when needed
+- **Test your patterns** - Use `make list-ignored` to verify correct exclusions
+- **Keep it minimal** - Only exclude directories that actually contain Makefiles
+- **Version control** - Commit `.make/.makeignore` to share exclusions across the team
 
 ### Customizing the Main Makefile
 
