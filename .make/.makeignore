@@ -1,0 +1,113 @@
+# .makeignore - Exclude directories from Makefile auto-discovery
+# ================================================================
+# This file controls which directories containing Makefiles should be
+# excluded from the main Makefile's auto-discovery and inclusion system.
+#
+# Format:
+# - One pattern per line
+# - Lines starting with # are comments
+# - Empty lines are ignored
+# - Patterns match against directory names relative to project root
+# - Use * for wildcards (shell glob patterns)
+#
+# Only list directories that might actually contain Makefiles
+# but should not be included in the main build system.
+# ================================================================
+
+# Test directories (often have their own test-specific Makefiles)
+# test
+# tests
+# test-*
+# *-test
+
+# Example and demo directories (may contain example Makefiles)
+examples
+example
+demos
+demo
+samples
+sample
+
+# Experimental or development directories
+experimental
+sandbox
+playground
+scratch
+spike
+poc                # Proof of concept
+wip               # Work in progress
+
+# Backup and deprecated directories  
+backup
+backups
+old
+deprecated
+archive
+legacy
+*-old
+*-backup
+*-deprecated
+
+# Vendor and third-party code (may include their own Makefiles)
+vendor
+third-party
+external
+libs
+dependencies
+
+# Build artifacts that might contain generated Makefiles
+# build
+# dist
+# out
+
+# Template directories (contain Makefile templates, not active Makefiles)
+templates
+template
+boilerplate
+skeleton
+scaffolding
+
+# Documentation that might have its own build system
+# docs
+# documentation
+
+# Deployment configurations with separate build processes
+# deploy
+# deployment
+# kubernetes
+# k8s
+# helm
+# docker
+
+# Subprojects or packages in monorepos
+# packages/*
+# apps/*
+# services/*
+# modules/*
+
+# Environment-specific directories
+# *-dev
+# *-staging  
+# *-prod
+# environments/*
+
+# CI/CD directories that might have test Makefiles
+.github
+.gitlab
+.circleci
+
+# Local development directories
+local
+local-*
+private
+personal
+tmp
+temp
+
+# =================================================================
+# Project-specific ignores
+# =================================================================
+# Add your project-specific patterns below this line
+
+# Demo directory for showing ignore functionality
+ignored-folder

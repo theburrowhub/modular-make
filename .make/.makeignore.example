@@ -1,0 +1,356 @@
+# .makeignore.example - Example patterns for excluding Makefile directories
+# ==========================================================================
+# Copy this file to .make/.makeignore and uncomment the patterns you need
+#
+# PURPOSE:
+# This file controls which directories containing Makefiles should be excluded
+# from the main Makefile's auto-discovery and inclusion system.
+#
+# IMPORTANT: Only include directories that might actually contain Makefiles.
+# Directories like .git, node_modules, __pycache__, etc. will never contain
+# Makefiles, so there's no need to list them here.
+#
+# FORMAT RULES:
+# - One pattern per line
+# - Lines starting with # are comments
+# - Empty lines are ignored
+# - Patterns match directory names relative to project root
+# - Use * for wildcards (shell glob patterns)
+# - Patterns are case-sensitive
+# ==========================================================================
+
+# --------------------------------------------------------------------------
+# Testing Directories
+# --------------------------------------------------------------------------
+# Test directories often have their own Makefiles for running tests
+# independently from the main build system
+# test
+# tests
+# test-*
+# *-test
+# *-tests
+# integration-tests
+# unit-tests
+# e2e-tests
+# spec
+# __tests__
+# test-utils
+# test-fixtures
+# test-data
+
+# --------------------------------------------------------------------------
+# Example and Documentation Directories
+# --------------------------------------------------------------------------
+# These might contain example Makefiles for documentation purposes
+# that shouldn't be part of the actual build
+examples
+example
+demos
+demo
+samples
+sample
+tutorials
+tutorial
+guides
+getting-started
+quickstart
+
+# --------------------------------------------------------------------------
+# Experimental and Development Directories
+# --------------------------------------------------------------------------
+# Work-in-progress or experimental code with separate build processes
+experimental
+experiment
+sandbox
+playground
+scratch
+spike
+spikes
+poc                   # Proof of concept
+prototype
+prototypes
+wip                  # Work in progress
+draft
+drafts
+dev
+development
+research
+lab
+
+# --------------------------------------------------------------------------
+# Backup and Archive Directories
+# --------------------------------------------------------------------------
+# Old versions or backups that might still contain Makefiles
+backup
+backups
+old
+deprecated
+archive
+archives
+legacy
+previous
+*-old
+*-backup
+*-deprecated
+*-legacy
+*-archive
+retired
+
+# --------------------------------------------------------------------------
+# Vendor and Third-Party Code
+# --------------------------------------------------------------------------
+# External code that includes its own Makefiles
+vendor
+vendors
+third-party
+3rd-party
+external
+extern
+libs
+libraries
+dependencies
+packages
+submodules
+
+# --------------------------------------------------------------------------
+# Build Output Directories (if they contain generated Makefiles)
+# --------------------------------------------------------------------------
+# Uncomment only if your build process generates Makefiles in output dirs
+# build
+# dist
+# out
+# output
+# target
+# release
+# debug
+# bin
+# lib
+
+# --------------------------------------------------------------------------
+# Template and Boilerplate Directories
+# --------------------------------------------------------------------------
+# Makefile templates that shouldn't be active
+templates
+template
+boilerplate
+boilerplates
+skeleton
+skeletons
+scaffolding
+scaffold
+starters
+starter
+archetypes
+blueprints
+
+# --------------------------------------------------------------------------
+# Documentation Build Systems
+# --------------------------------------------------------------------------
+# Documentation might have its own Makefile for building docs
+# docs
+# documentation
+# doc
+# api-docs
+# user-guide
+# manual
+# help
+# book
+# site
+
+# --------------------------------------------------------------------------
+# Deployment and Infrastructure
+# --------------------------------------------------------------------------
+# Deployment configurations with separate build processes
+# deploy
+# deployment
+# deployments
+# infrastructure
+# infra
+# terraform
+# ansible
+# kubernetes
+# k8s
+# helm
+# charts
+# docker
+# containers
+# compose
+# stack
+# swarm
+
+# --------------------------------------------------------------------------
+# CI/CD Directories
+# --------------------------------------------------------------------------
+# CI/CD configurations that might include test Makefiles
+.github
+.gitlab
+.circleci
+.travis
+.jenkins
+.buildkite
+.drone
+.azure-pipelines
+ci
+cd
+pipeline
+pipelines
+workflows
+
+# --------------------------------------------------------------------------
+# Monorepo Package Directories
+# --------------------------------------------------------------------------
+# In monorepos, you might want to exclude certain packages
+# packages/*           # All packages
+# packages/deprecated-*
+# packages/experimental-*
+# packages/legacy-*
+# packages/*/examples  # Example dirs within packages
+# apps/*
+# services/*
+# modules/*
+# components/*
+# libraries/*
+# tools/*
+# utils/*
+
+# --------------------------------------------------------------------------
+# Environment-Specific Directories
+# --------------------------------------------------------------------------
+# Different environments might have different build processes
+# dev
+# development
+# staging
+# production
+# prod
+# qa
+# uat
+# local
+# *-dev
+# *-staging
+# *-prod
+# *-local
+# environments/*
+# envs/*
+# configs/*
+
+# --------------------------------------------------------------------------
+# Tool-Specific Directories
+# --------------------------------------------------------------------------
+# Directories for specific tools that have their own Makefiles
+# scripts
+# tools
+# utilities
+# utils
+# bin
+# cmd
+# commands
+# tasks
+# automation
+# ops
+# devops
+
+# --------------------------------------------------------------------------
+# Client/Server Splits
+# --------------------------------------------------------------------------
+# In full-stack projects, you might want to exclude one side
+# client
+# frontend
+# front-end
+# ui
+# web
+# app
+# server
+# backend
+# back-end
+# api
+# services
+
+# --------------------------------------------------------------------------
+# Mobile and Platform-Specific
+# --------------------------------------------------------------------------
+# Platform-specific builds with their own Makefiles
+# ios
+# android
+# mobile
+# desktop
+# electron
+# cordova
+# react-native
+# flutter
+
+# --------------------------------------------------------------------------
+# Generated or Temporary Directories
+# --------------------------------------------------------------------------
+# Temporary directories that might be created with Makefiles
+tmp
+temp
+temporary
+cache
+.cache
+.tmp
+local-*
+private
+personal
+ignore
+ignored
+ignored-*
+do-not-include
+
+# --------------------------------------------------------------------------
+# Feature Branches and Experiments
+# --------------------------------------------------------------------------
+# Feature branch directories that shouldn't affect main build
+feature-*
+bugfix-*
+hotfix-*
+release-*
+patch-*
+
+# --------------------------------------------------------------------------
+# Customer or Client Specific
+# --------------------------------------------------------------------------
+# Customer-specific code with separate builds
+# customer-*
+# client-*
+# partner-*
+# custom/*
+# customizations/*
+
+# ==========================================================================
+# PROJECT-SPECIFIC PATTERNS
+# ==========================================================================
+# Add your project-specific patterns below this line
+
+
+
+
+# ==========================================================================
+# USAGE TIPS:
+# ==========================================================================
+#
+# 1. Only uncomment patterns for directories that:
+#    - Actually exist in your project
+#    - Contain or might contain Makefiles
+#    - Should not be included in the main build
+#
+# 2. Test your configuration:
+#    make list-subdirs   # Shows included directories
+#    make list-ignored   # Shows what's being ignored
+#
+# 3. Common use cases:
+#    - Exclude test directories with separate test runners
+#    - Exclude experimental code not ready for production
+#    - Exclude examples that shouldn't run with main build
+#    - Exclude vendor code with its own build system
+#    - Exclude deployment configs managed separately
+#
+# 4. Remember: .makeignore only affects auto-discovery.
+#    You can still run make directly in ignored directories.
+#
+# 5. For monorepos: Use patterns like 'packages/*/test' to exclude
+#    test directories within all packages
+#
+# 6. Version control: Consider tracking .makeignore.example but
+#    not .makeignore if team members need different configs
+#
+# ==========================================================================

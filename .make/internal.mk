@@ -46,6 +46,76 @@ list-subdirs: ## List all discovered subdirectories with Makefiles
 	@echo ""
 	@echo "${YELLOW}Total: $$(echo '$(SUBDIRS)' | wc -w) subdirectories${NC}"
 
+list-ignored: ## Show directories being ignored by .makeignore
+	@echo "${CYAN}Ignored Directories (.make/.makeignore):${NC}"
+	@echo ""
+	@if [ -f .make/.makeignore ]; then \
+		echo "${YELLOW}Patterns in .makeignore:${NC}"; \
+		grep -v '^\#' .make/.makeignore | sed 's/\#.*$$//g' | grep -v '^$$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$$//' | while read pattern; do \
+			echo "  ${CYAN}$$pattern${NC}"; \
+		done; \
+		echo ""; \
+		echo "${YELLOW}Directories with Makefiles that are ignored:${NC}"; \
+		found_ignored=0; \
+		for dir in $(ALL_SUBDIRS); do \
+			is_included=0; \
+			for included in $(SUBDIRS); do \
+				if [ "$$dir" = "$$included" ]; then \
+					is_included=1; \
+					break; \
+				fi; \
+			done; \
+			if [ $$is_included -eq 0 ]; then \
+				echo "  ${RED}✗${NC} $$dir/ (ignored)"; \
+				found_ignored=1; \
+			fi; \
+		done; \
+		if [ $$found_ignored -eq 0 ]; then \
+			echo "  ${GREEN}None currently ignored${NC}"; \
+		fi; \
+	else \
+		echo "${YELLOW}No .make/.makeignore file found${NC}"; \
+		echo "Create one to exclude directories from auto-discovery."; \
+	fi
+
+edit-ignore: ## Edit the .makeignore file
+	@$${EDITOR:-vi} .make/.makeignore
+
+ignore-init: ## Initialize .makeignore from example file
+	@if [ -f .make/.makeignore ]; then \
+		echo "${YELLOW}⚠️  .make/.makeignore already exists. Use 'make edit-ignore' to modify it.${NC}"; \
+		echo "    To reset, delete .make/.makeignore first: rm .make/.makeignore"; \
+	else \
+		if [ -f .make/.makeignore.example ]; then \
+			cp .make/.makeignore.example .make/.makeignore; \
+			echo "${GREEN}✅ Created .make/.makeignore from example file${NC}"; \
+			echo "    Edit it with: make edit-ignore"; \
+			echo "    View ignored: make list-ignored"; \
+		else \
+			echo "${YELLOW}Creating basic .make/.makeignore file...${NC}"; \
+			echo "# Makefile Ignore Patterns" > .make/.makeignore; \
+			echo "# Add directories to exclude from auto-discovery" >> .make/.makeignore; \
+			echo "" >> .make/.makeignore; \
+			echo "# Version control" >> .make/.makeignore; \
+			echo ".git" >> .make/.makeignore; \
+			echo ".svn" >> .make/.makeignore; \
+			echo "" >> .make/.makeignore; \
+			echo "# Dependencies" >> .make/.makeignore; \
+			echo "node_modules" >> .make/.makeignore; \
+			echo "vendor" >> .make/.makeignore; \
+			echo "" >> .make/.makeignore; \
+			echo "# Build outputs" >> .make/.makeignore; \
+			echo "build" >> .make/.makeignore; \
+			echo "dist" >> .make/.makeignore; \
+			echo "out" >> .make/.makeignore; \
+			echo "" >> .make/.makeignore; \
+			echo "# Temporary" >> .make/.makeignore; \
+			echo "tmp" >> .make/.makeignore; \
+			echo "temp" >> .make/.makeignore; \
+			echo "${GREEN}✅ Created basic .make/.makeignore file${NC}"; \
+		fi \
+	fi
+
 list-marked: ## List only marked targets from all Makefiles
 	@echo "${CYAN}Marked targets across all Makefiles:${NC}"
 	@echo ""
@@ -311,4 +381,4 @@ validate-makefiles: ## Validate syntax of all Makefiles
 	done; \
 	[ $$error -eq 0 ] && echo "${GREEN}All Makefiles are valid!${NC}" || echo "${RED}Some Makefiles have errors${NC}"
 
-.PHONY: utils utilities list-all list-subdirs list-marked deps-init deps-edit deps-show check-deps check-conflicts info graph validate-makefiles
+.PHONY: utils utilities list-all list-subdirs list-ignored edit-ignore ignore-init list-marked deps-init deps-edit deps-show check-deps check-conflicts info graph validate-makefiles

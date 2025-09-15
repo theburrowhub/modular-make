@@ -14,7 +14,24 @@
 MAIN_MAKEFILE := $(firstword $(MAKEFILE_LIST))
 
 # Automatically find all subdirectories containing Makefiles
-SUBDIRS := $(shell find . -mindepth 2 -maxdepth 2 -name Makefile -type f | xargs -I {} dirname {} | sed 's|^\./||' | sort)
+ALL_SUBDIRS := $(shell find . -mindepth 2 -maxdepth 2 -name Makefile -type f | xargs -I {} dirname {} | sed 's|^\./||' | sort)
+
+# Filter out directories matching patterns in .make/.makeignore
+# Uses a temporary file to handle patterns with wildcards safely
+ifneq ($(wildcard .make/.makeignore),)
+SUBDIRS := $(shell \
+	tmpfile=$$(mktemp); \
+	grep -v '^\#' .make/.makeignore | sed 's/\#.*$$//g' | grep -v '^$$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$$//' > $$tmpfile; \
+	for dir in $(ALL_SUBDIRS); do \
+		if ! echo "$$dir" | grep -qf $$tmpfile 2>/dev/null; then \
+			echo "$$dir"; \
+		fi; \
+	done; \
+	rm -f $$tmpfile \
+)
+else
+SUBDIRS := $(ALL_SUBDIRS)
+endif
 
 # Include internal utilities first (for variables and helpers)
 -include .make/internal.mk
