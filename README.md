@@ -7,7 +7,12 @@ A comprehensive, modular Makefile system designed to simplify and standardize bu
 - [Overview](#overview)
 - [Features](#features)
 - [Getting Started](#-getting-started)
+  - [Quick Setup with Cherry-go (Recommended)](#quick-setup-with-cherry-go--2-minutes---recommended)
+  - [Alternative: Manual Setup](#alternative-manual-setup--2-minutes)
 - [Installation](#installation)
+  - [Method 1: Install with Cherry-go](#method-1-install-with-cherry-go-recommended)
+  - [Method 2: Quick Manual Install](#method-2-quick-manual-install)
+  - [Method 3: Use as a Git Submodule](#method-3-use-as-a-git-submodule)
 - [Basic Usage](#basic-usage)
 - [Help System](#help-system)
 - [Dependency Management](#dependency-management)
@@ -45,7 +50,31 @@ This Makefile system provides a scalable, maintainable approach to project autom
 
 ## 🚀 Getting Started
 
-### Quick Setup (< 2 minutes)
+### Quick Setup with Cherry-go (< 2 minutes) - Recommended
+
+The fastest way to install Modular Make is using [cherry-go](https://github.com/theburrowhub/cherry-go):
+
+1. **Install cherry-go** (one-time setup):
+   ```bash
+   curl -sSL https://raw.githubusercontent.com/theburrowhub/cherry-go/main/install.sh | bash
+   ```
+
+2. **Import Modular Make to your project**:
+   ```bash
+   cd your-project
+   cherry-go add cb https://raw.githubusercontent.com/theburrowhub/modular-make/refs/heads/main/full-install.cherrybunch
+   cherry-go sync full-install
+   ```
+
+3. **Test it works**:
+   ```bash
+   make        # Shows quick help
+   make help   # Shows full documentation
+   ```
+
+That's it! You now have a fully functional Makefile system that can be easily updated with `cherry-go sync full-install`.
+
+### Alternative: Manual Setup (< 2 minutes)
 
 1. **Clone this repository**:
    ```bash
@@ -64,8 +93,6 @@ This Makefile system provides a scalable, maintainable approach to project autom
    make        # Shows quick help
    make help   # Shows full documentation
    ```
-
-That's it! You now have a fully functional Makefile system.
 
 ### Optional: Add Example Modules
 
@@ -131,7 +158,62 @@ make start     # Runs your new target
 
 ## Installation
 
-### Quick Install in Your Project
+### Method 1: Install with Cherry-go (Recommended)
+
+[Cherry-go](https://github.com/theburrowhub/cherry-go) is a command-line tool for partial versioning that allows you to selectively sync specific files or directories from remote repositories. It's perfect for maintaining the Modular Make system in your project while keeping it synchronized with updates.
+
+#### Install Cherry-go
+
+First, install cherry-go on your system:
+
+```bash
+# Download and install cherry-go
+curl -sSL https://raw.githubusercontent.com/theburrowhub/cherry-go/main/install.sh | bash
+
+# Or with Go installed:
+go install github.com/theburrowhub/cherry-go@latest
+```
+
+#### Use the Cherrybunch File
+
+This repository includes a `full-install.cherrybunch` file that configures cherry-go to sync the complete Modular Make system:
+
+```bash
+# In your project directory
+cd /path/to/your/project
+
+# Initialize cherry-go with the cherrybunch file
+cherry-go add cb https://raw.githubusercontent.com/theburrowhub/modular-make/refs/heads/main/full-install.cherrybunch
+
+# Sync the files (this downloads the Makefile and .make directory)
+cherry-go sync full-install
+
+# Verify installation
+make info
+```
+
+#### Benefits of Using Cherry-go
+
+- **Selective Sync**: Only sync the files you need (modify the cherrybunch file as needed)
+- **Version Control**: Track specific branches or tags of the Modular Make system
+- **Easy Updates**: Simply run `cherry-go sync --all` to get the latest changes
+- **Conflict Detection**: Cherry-go detects when you've modified files locally
+- **No Git Submodules**: Cleaner repository without submodule complexities
+
+#### Keeping Your System Updated
+
+```bash
+# Check for updates from the source repository
+cherry-go sync --all --dry-run
+
+# Apply updates (with conflict detection)
+cherry-go sync --all
+
+# Force updates (override local changes)
+cherry-go sync --all --force
+```
+
+### Method 2: Quick Manual Install
 
 1. **Clone or download** this repository:
    ```bash
@@ -165,7 +247,7 @@ make start     # Runs your new target
    make info
    ```
 
-### Alternative: Use as a Git Submodule
+### Method 3: Use as a Git Submodule
 
 ```bash
 cd /path/to/your/project
