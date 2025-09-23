@@ -1,0 +1,12 @@
+name: full-install
+description: Install everything everywhere
+version: "1.0"
+repository: git@github.com:theburrowhub/modular-make.git
+files:
+    - path: Makefile
+      local_path: Makefile
+      branch: main
+directories:
+    - path: .make
+      local_path: .make
+      branch: main
