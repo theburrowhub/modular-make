@@ -168,8 +168,4 @@ clean-all: ## Clean all generated files and resources
 	done
 	@echo "${GREEN}✅ Cleanup completed!${NC}"
 
-# Aliases
-auto-update: modular-make-auto-update
-add-cherrybunch: modular-make-cherry-add
-
-.PHONY: quick help all clean-all update auto-update modular-make-cherry-add modular-make-auto-update
+.PHONY: quick help all clean-all self-update self-cherry-add
