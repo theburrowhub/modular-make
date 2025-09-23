@@ -120,12 +120,12 @@ help: ## Show full help with examples
 
 ##@ Main Operations
 
-modular-make-auto-update: ## Auto-update Makefile system using cherry-go
+self-update: ## Auto-update Makefile system using cherry-go
 	@echo "${CYAN}🔄 Syncing Makefile system with cherry-go...${NC}"
 	@cherry-go sync full-install
 	@echo "${GREEN}✅ Update completed!${NC}"
 
-modular-make-cherry-add: ## Add cherry bunch configuration from repository
+self-cherry-add: ## Add cherry bunch configuration from repository
 	@echo "${CYAN}📦 Adding cherry bunch configuration...${NC}"
 	@cherry-go add cb https://raw.githubusercontent.com/theburrowhub/modular-make/refs/heads/main/full-install.cherrybunch
 	@echo "${GREEN}✅ Cherry bunch configuration added!${NC}"
