@@ -120,6 +120,20 @@ help: ## Show full help with examples
 
 ##@ Main Operations
 
+update: ##! Auto-update Makefile system using cherry-go
+	@echo "${CYAN}🔄 Syncing Makefile system with cherry-go...${NC}"
+	@cherry-go sync full-install
+	@echo "${GREEN}✅ Update completed!${NC}"
+
+auto-update: update ## Alias for update
+
+cherry-add: ## Add cherry bunch configuration from repository
+	@echo "${CYAN}📦 Adding cherry bunch configuration...${NC}"
+	@cherry-go add cb https://raw.githubusercontent.com/theburrowhub/modular-make/refs/heads/main/full-install.cherrybunch
+	@echo "${GREEN}✅ Cherry bunch configuration added!${NC}"
+
+add-cherrybunch: cherry-add ## Alias for cherry-add
+
 all: ## Run all build and deploy steps
 	@echo "${BLUE}🚀 Running complete build and deploy pipeline...${NC}"
 	@# Try to run docker build if available
@@ -160,4 +174,4 @@ clean-all: ## Clean all generated files and resources
 
 
 
-.PHONY: quick help all clean-all
+.PHONY: quick help all clean-all update auto-update cherry-add add-cherrybunch

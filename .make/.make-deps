@@ -19,6 +19,7 @@ helm:Kubernetes package manager:optional
 curl:HTTP client for testing:recommended
 jq:JSON processor:optional
 yq:YAML processor:optional
+cherry-go:Cherry-go dependency manager:required
 
 # Language specific (add as needed)
 python3:Python runtime:optional
