@@ -12,6 +12,11 @@ utils: ## Show all system utilities
 		/^##@/ { section = substr($$0, 5); printf "\n${YELLOW}%s:${NC}\n", section; next } \
 		/^[a-zA-Z_0-9-]+:.*?##/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' .make/internal.mk
 	@echo ""
+	@echo "${CYAN}Quick Access:${NC}"
+	@echo "  ${GREEN}make check-deps${NC}   - Check all dependencies status"
+	@echo "  ${GREEN}make deps-update${NC}  - Auto-install missing dependencies"
+	@echo "  ${GREEN}make deps-list${NC}    - List all dependencies"
+	@echo ""
 	@echo "${CYAN}Use any of these utilities directly, e.g., 'make info'${NC}"
 
 utilities: utils ## Alias for utils
@@ -133,106 +138,6 @@ list-marked: ## List only marked targets from all Makefiles
 			echo ""; \
 		fi \
 	done
-
-deps-init: ## Initialize dependencies file from example
-	@if [ -f .make/.make-deps ]; then \
-		echo "${YELLOW}⚠️  .make/.make-deps already exists. Use 'make deps-edit' to modify it.${NC}"; \
-		echo "    To reset, delete .make/.make-deps first: rm .make/.make-deps"; \
-	else \
-		if [ -f .make/.make-deps.example ]; then \
-			cp .make/.make-deps.example .make/.make-deps; \
-			echo "${GREEN}✅ Created .make/.make-deps from example file${NC}"; \
-			echo "    Edit it with: make deps-edit"; \
-		else \
-			echo "${YELLOW}Creating basic .make/.make-deps file...${NC}"; \
-			echo "# Project Dependencies" > .make/.make-deps; \
-			echo "make:GNU Make:required" >> .make/.make-deps; \
-			echo "docker:Docker:recommended" >> .make/.make-deps; \
-			echo "kubectl:Kubernetes CLI:recommended" >> .make/.make-deps; \
-			echo "${GREEN}✅ Created basic .make/.make-deps file${NC}"; \
-		fi \
-	fi
-
-deps-edit: ## Edit the dependencies configuration file
-	@$${EDITOR:-vi} .make/.make-deps
-
-deps-show: ## Show the dependencies configuration
-	@echo "${CYAN}Dependencies Configuration (.make/.make-deps):${NC}"
-	@echo ""
-	@if [ -f .make/.make-deps ]; then \
-		cat .make/.make-deps | while IFS= read -r line; do \
-			if [ -z "$$line" ]; then \
-				echo ""; \
-			elif [ "$${line:0:1}" = "#" ]; then \
-				echo "${CYAN}$$line${NC}"; \
-			else \
-				echo "$$line"; \
-			fi; \
-		done; \
-	else \
-		echo "${YELLOW}No .make/.make-deps file found${NC}"; \
-	fi
-
-check-deps: ## Check required dependencies from .make/.make-deps file
-	@echo "${BLUE}🔍 Checking dependencies...${NC}"
-	@echo ""
-	@# Check if dependencies file exists
-	@if [ ! -f .make/.make-deps ]; then \
-		echo "${YELLOW}⚠️  Dependencies file '.make/.make-deps' not found${NC}"; \
-		echo "Creating default dependencies file..."; \
-		echo "# Add your dependencies here" > .make/.make-deps; \
-		echo "make:GNU Make:required" >> .make/.make-deps; \
-		echo "docker:Docker container runtime:recommended" >> .make/.make-deps; \
-		echo "kubectl:Kubernetes CLI:recommended" >> .make/.make-deps; \
-	fi
-	@# Parse and check each dependency
-	@required_missing=0; recommended_missing=0; \
-	echo "${YELLOW}Required:${NC}"; \
-	while IFS=: read -r cmd desc level || [ -n "$$cmd" ]; do \
-		if [ -z "$$cmd" ] || [ "$${cmd:0:1}" = "#" ]; then continue; fi; \
-		if [ "$$level" = "required" ]; then \
-			if command -v $$cmd >/dev/null 2>&1; then \
-				echo "  ${GREEN}✓${NC} $$desc ($$cmd)"; \
-			else \
-				echo "  ${RED}✗${NC} $$desc ($$cmd) - NOT FOUND"; \
-				required_missing=$$((required_missing + 1)); \
-			fi; \
-		fi; \
-	done < .make/.make-deps; \
-	echo ""; \
-	echo "${YELLOW}Recommended:${NC}"; \
-	while IFS=: read -r cmd desc level || [ -n "$$cmd" ]; do \
-		if [ -z "$$cmd" ] || [ "$${cmd:0:1}" = "#" ]; then continue; fi; \
-		if [ "$$level" = "recommended" ]; then \
-			if command -v $$cmd >/dev/null 2>&1; then \
-				echo "  ${GREEN}✓${NC} $$desc ($$cmd)"; \
-			else \
-				echo "  ${YELLOW}○${NC} $$desc ($$cmd) - not found"; \
-				recommended_missing=$$((recommended_missing + 1)); \
-			fi; \
-		fi; \
-	done < .make/.make-deps; \
-	echo ""; \
-	echo "${YELLOW}Optional:${NC}"; \
-	while IFS=: read -r cmd desc level || [ -n "$$cmd" ]; do \
-		if [ -z "$$cmd" ] || [ "$${cmd:0:1}" = "#" ]; then continue; fi; \
-		if [ "$$level" = "optional" ]; then \
-			if command -v $$cmd >/dev/null 2>&1; then \
-				echo "  ${GREEN}✓${NC} $$desc ($$cmd)"; \
-			else \
-				echo "  ${CYAN}○${NC} $$desc ($$cmd) - not installed"; \
-			fi; \
-		fi; \
-	done < .make/.make-deps; \
-	echo ""; \
-	if [ $$required_missing -gt 0 ]; then \
-		echo "${RED}⚠️  Missing $$required_missing required dependencies!${NC}"; \
-		exit 1; \
-	elif [ $$recommended_missing -gt 0 ]; then \
-		echo "${YELLOW}ℹ️  Missing $$recommended_missing recommended dependencies${NC}"; \
-	else \
-		echo "${GREEN}✅ All required and recommended dependencies are installed!${NC}"; \
-	fi
 
 check-conflicts: ## Check for target name conflicts across Makefiles
 	@echo "${BLUE}🔍 Checking for target conflicts...${NC}"
@@ -381,4 +286,283 @@ validate-makefiles: ## Validate syntax of all Makefiles
 	done; \
 	[ $$error -eq 0 ] && echo "${GREEN}All Makefiles are valid!${NC}" || echo "${RED}Some Makefiles have errors${NC}"
 
-.PHONY: utils utilities list-all list-subdirs list-ignored edit-ignore ignore-init list-marked deps-init deps-edit deps-show check-deps check-conflicts info graph validate-makefiles
+##@ Dependencies and Tools Management
+
+check-deps: ## Check all dependencies and show installation status
+	@echo "${BLUE}🔍 Checking dependencies...${NC}"
+	@echo ""
+	@if [ ! -f .make/.make-deps ]; then \
+		echo "${YELLOW}⚠️  Dependencies file '.make/.make-deps' not found${NC}"; \
+		exit 1; \
+	fi
+	@# Parse and check each dependency
+	@{ required_missing=0; recommended_missing=0; optional_missing=0; \
+	required_installable=0; recommended_installable=0; optional_installable=0; \
+	echo "${YELLOW}Required:${NC}"; \
+	grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
+		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
+		desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
+		level=$$(echo "$$line" | awk -F':::' '{print $$3}'); \
+		check_cmd=$$(echo "$$line" | awk -F':::' '{print $$4}'); \
+		install_cmd=$$(echo "$$line" | awk -F':::' '{print $$5}'); \
+		if [ -z "$$cmd" ]; then continue; fi; \
+		if [ "$$level" = "required" ]; then \
+			if command -v $$cmd >/dev/null 2>&1; then \
+				version=$$(eval "$$check_cmd" 2>/dev/null | head -1 || echo "installed"); \
+				echo "  ${GREEN}✓${NC} $$cmd - $$desc"; \
+				echo "    $$version" | sed 's/^/    /' | head -1; \
+			else \
+				echo "  ${RED}✗${NC} $$cmd - $$desc"; \
+				if [ ! -z "$$install_cmd" ]; then \
+					echo "    ${CYAN}→ Install with: make deps-install TOOL=$$cmd${NC}"; \
+					echo "REQ_INSTALLABLE"; \
+				else \
+					echo "    Manual installation required"; \
+				fi; \
+				echo "REQ_MISSING"; \
+			fi; \
+		fi; \
+	done; \
+	echo ""; \
+	echo "${YELLOW}Recommended:${NC}"; \
+	grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
+		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
+		desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
+		level=$$(echo "$$line" | awk -F':::' '{print $$3}'); \
+		check_cmd=$$(echo "$$line" | awk -F':::' '{print $$4}'); \
+		install_cmd=$$(echo "$$line" | awk -F':::' '{print $$5}'); \
+		if [ -z "$$cmd" ]; then continue; fi; \
+		if [ "$$level" = "recommended" ]; then \
+			if command -v $$cmd >/dev/null 2>&1; then \
+				version=$$(eval "$$check_cmd" 2>/dev/null | head -1 || echo "installed"); \
+				echo "  ${GREEN}✓${NC} $$cmd - $$desc"; \
+			else \
+				echo "  ${YELLOW}○${NC} $$cmd - $$desc"; \
+				if [ ! -z "$$install_cmd" ]; then \
+					echo "    ${CYAN}→ Install with: make deps-install TOOL=$$cmd${NC}"; \
+					echo "REC_INSTALLABLE"; \
+				fi; \
+				echo "REC_MISSING"; \
+			fi; \
+		fi; \
+	done; \
+	echo ""; \
+	echo "${YELLOW}Optional:${NC}"; \
+	grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
+		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
+		desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
+		level=$$(echo "$$line" | awk -F':::' '{print $$3}'); \
+		check_cmd=$$(echo "$$line" | awk -F':::' '{print $$4}'); \
+		install_cmd=$$(echo "$$line" | awk -F':::' '{print $$5}'); \
+		if [ -z "$$cmd" ]; then continue; fi; \
+		if [ "$$level" = "optional" ]; then \
+			if command -v $$cmd >/dev/null 2>&1; then \
+				echo "  ${GREEN}✓${NC} $$cmd - $$desc"; \
+			else \
+				echo "  ${CYAN}○${NC} $$cmd - $$desc"; \
+				if [ ! -z "$$install_cmd" ]; then \
+					echo "    ${CYAN}→ Install with: make deps-install TOOL=$$cmd${NC}"; \
+				fi; \
+			fi; \
+		fi; \
+	done; } | { \
+		required_missing=0; required_installable=0; \
+		recommended_missing=0; recommended_installable=0; \
+		while IFS= read -r line; do \
+			echo "$$line" | grep -q "^REQ_MISSING$$" && required_missing=$$((required_missing + 1)) && continue; \
+			echo "$$line" | grep -q "^REQ_INSTALLABLE$$" && required_installable=$$((required_installable + 1)) && continue; \
+			echo "$$line" | grep -q "^REC_MISSING$$" && recommended_missing=$$((recommended_missing + 1)) && continue; \
+			echo "$$line" | grep -q "^REC_INSTALLABLE$$" && recommended_installable=$$((recommended_installable + 1)) && continue; \
+			echo "$$line"; \
+		done; \
+		echo ""; \
+		if [ "$$required_missing" -gt 0 ] 2>/dev/null; then \
+			echo "${RED}⚠️  Missing $$required_missing required dependencies!${NC}"; \
+			if [ "$$required_installable" -gt 0 ] 2>/dev/null; then \
+				echo "${CYAN}   $$required_installable can be auto-installed with 'make deps-update'${NC}"; \
+			fi; \
+		elif [ "$$recommended_missing" -gt 0 ] 2>/dev/null; then \
+			echo "${YELLOW}ℹ️  Missing $$recommended_missing recommended dependencies${NC}"; \
+			if [ "$$recommended_installable" -gt 0 ] 2>/dev/null; then \
+				echo "${CYAN}   $$recommended_installable can be auto-installed with 'make deps-update'${NC}"; \
+			fi; \
+		else \
+			echo "${GREEN}✅ All required and recommended dependencies are installed!${NC}"; \
+		fi; \
+	}
+
+deps-update: ## Auto-install/update all installable dependencies
+	@echo "${CYAN}🔧 Installing/updating dependencies with available installers...${NC}"
+	@echo ""
+	@if [ ! -f .make/.make-deps ]; then \
+		echo "${YELLOW}⚠️  Dependencies file '.make/.make-deps' not found${NC}"; \
+		exit 1; \
+	fi
+	@updated=0; failed=0; skipped=0; \
+	grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
+		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
+		desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
+		level=$$(echo "$$line" | awk -F':::' '{print $$3}'); \
+		check_cmd=$$(echo "$$line" | awk -F':::' '{print $$4}'); \
+		install_cmd=$$(echo "$$line" | awk -F':::' '{print $$5}'); \
+		if [ -z "$$cmd" ] || [ -z "$$install_cmd" ]; then continue; fi; \
+		if ! command -v $$cmd >/dev/null 2>&1; then \
+			echo "${BLUE}📦 Installing $$cmd ($$level)...${NC}"; \
+			echo "  $$desc"; \
+			if eval "$$install_cmd" 2>/dev/null; then \
+				if command -v $$cmd >/dev/null 2>&1; then \
+					version=$$(eval "$$check_cmd" 2>/dev/null | head -1 || echo "installed"); \
+					echo "${GREEN}  ✅ $$cmd installed successfully${NC}"; \
+					echo "     $$version" | head -1; \
+					updated=$$((updated + 1)); \
+				else \
+					echo "${YELLOW}  ⚠️  $$cmd installed but not in PATH yet${NC}"; \
+					echo "     You may need to restart your shell"; \
+				fi; \
+			else \
+				echo "${RED}  ✗ Failed to install $$cmd${NC}"; \
+				failed=$$((failed + 1)); \
+			fi; \
+			echo ""; \
+		else \
+			skipped=$$((skipped + 1)); \
+		fi; \
+	done | { \
+		cat; \
+		echo "${GREEN}✅ Dependencies update completed!${NC}"; \
+		echo "   Already installed: $$skipped, Installed: $$updated, Failed: $$failed"; \
+	}
+
+deps-install: ## Install a specific dependency (use TOOL=name)
+	@if [ -z "$(TOOL)" ]; then \
+		echo "${RED}❌ Please specify a tool: make deps-install TOOL=cherry-go${NC}"; \
+		echo ""; \
+		echo "${CYAN}Available installable tools:${NC}"; \
+		grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
+			cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
+			desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
+			install_cmd=$$(echo "$$line" | awk -F':::' '{print $$5}'); \
+			if [ ! -z "$$cmd" ] && [ ! -z "$$install_cmd" ]; then \
+				if command -v $$cmd >/dev/null 2>&1; then \
+					echo "  ${GREEN}✓${NC} $$cmd - $$desc (installed)"; \
+				else \
+					echo "  ${YELLOW}○${NC} $$cmd - $$desc"; \
+				fi; \
+			fi; \
+		done; \
+		exit 1; \
+	fi
+	@echo "${CYAN}🔧 Installing $(TOOL)...${NC}"
+	@found=0; \
+	grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
+		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
+		desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
+		check_cmd=$$(echo "$$line" | awk -F':::' '{print $$4}'); \
+		install_cmd=$$(echo "$$line" | awk -F':::' '{print $$5}'); \
+		if [ "$$cmd" = "$(TOOL)" ]; then \
+			echo "FOUND"; \
+			if [ -z "$$install_cmd" ]; then \
+				echo "${RED}❌ $(TOOL) requires manual installation${NC}"; \
+				echo "  $$desc"; \
+				exit 1; \
+			fi; \
+			echo "  Description: $$desc"; \
+			if command -v $$cmd >/dev/null 2>&1; then \
+				echo "${YELLOW}  $(TOOL) is already installed${NC}"; \
+				version=$$(eval "$$check_cmd" 2>/dev/null | head -1 || echo "installed"); \
+				echo "  Version: $$version" | head -1; \
+				echo ""; \
+				echo "  Re-installing/updating..."; \
+			fi; \
+			eval "$$install_cmd"; \
+			if command -v $$cmd >/dev/null 2>&1; then \
+				version=$$(eval "$$check_cmd" 2>/dev/null | head -1 || echo "installed"); \
+				echo "${GREEN}✅ $(TOOL) installed successfully${NC}"; \
+				echo "  Version: $$version" | head -1; \
+			else \
+				echo "${YELLOW}⚠️  $(TOOL) installation may require PATH update or shell restart${NC}"; \
+			fi; \
+			break; \
+		fi; \
+	done | { \
+		found=0; \
+		while IFS= read -r line; do \
+			if [ "$$line" = "FOUND" ]; then \
+				found=1; \
+				continue; \
+			fi; \
+			echo "$$line"; \
+		done; \
+		if [ $$found -eq 0 ]; then \
+			echo "${RED}❌ Tool $(TOOL) not found in .make/.make-deps${NC}"; \
+			exit 1; \
+		fi; \
+	}
+
+deps-list: ## List all dependencies with installation capability
+	@echo "${CYAN}All Dependencies:${NC}"
+	@echo ""
+	@grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
+		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
+		desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
+		level=$$(echo "$$line" | awk -F':::' '{print $$3}'); \
+		install_cmd=$$(echo "$$line" | awk -F':::' '{print $$5}'); \
+		if [ -z "$$cmd" ]; then continue; fi; \
+		if command -v $$cmd >/dev/null 2>&1; then \
+			echo "  ${GREEN}✓${NC} $$cmd ($$level) - $$desc"; \
+		else \
+			if [ ! -z "$$install_cmd" ]; then \
+				echo "  ${YELLOW}○${NC} $$cmd ($$level) - $$desc ${CYAN}[auto-installable]${NC}"; \
+			else \
+				echo "  ${CYAN}○${NC} $$cmd ($$level) - $$desc ${DIM}[manual install]${NC}"; \
+			fi; \
+		fi; \
+	done
+	@echo ""
+	@echo "${CYAN}Legend:${NC}"
+	@echo "  ${GREEN}✓${NC} = installed"
+	@echo "  ${YELLOW}○${NC} = can be installed with 'make deps-install TOOL=name'"
+	@echo "  ${CYAN}○${NC} = requires manual installation"
+
+deps-edit: ## Edit the dependencies configuration file
+	@$${EDITOR:-vi} .make/.make-deps
+
+deps-show: ## Show the raw dependencies configuration
+	@echo "${CYAN}Dependencies Configuration (.make/.make-deps):${NC}"
+	@echo ""
+	@if [ -f .make/.make-deps ]; then \
+		cat .make/.make-deps | while IFS= read -r line; do \
+			if [ -z "$$line" ]; then \
+				echo ""; \
+			elif [ "$${line:0:1}" = "#" ]; then \
+				echo "${CYAN}$$line${NC}"; \
+			else \
+				echo "$$line"; \
+			fi; \
+		done; \
+	else \
+		echo "${YELLOW}No .make/.make-deps file found${NC}"; \
+	fi
+
+deps-init: ## Initialize dependencies file from example
+	@if [ -f .make/.make-deps ]; then \
+		echo "${YELLOW}⚠️  .make/.make-deps already exists. Use 'make deps-edit' to modify it.${NC}"; \
+		echo "    To reset, delete .make/.make-deps first: rm .make/.make-deps"; \
+	else \
+		if [ -f .make/.make-deps.example ]; then \
+			cp .make/.make-deps.example .make/.make-deps; \
+			echo "${GREEN}✅ Created .make/.make-deps from example file${NC}"; \
+			echo "    Edit it with: make deps-edit"; \
+		else \
+			echo "${YELLOW}Creating basic .make/.make-deps file...${NC}"; \
+			echo "# Makefile System Dependencies" > .make/.make-deps; \
+			echo "# Format: command:::description:::level:::check_command:::install_command" >> .make/.make-deps; \
+			echo "" >> .make/.make-deps; \
+			echo "make:::GNU Make build tool:::required:::make --version:::" >> .make/.make-deps; \
+			echo "docker:::Docker container runtime:::recommended:::docker --version:::" >> .make/.make-deps; \
+			echo "kubectl:::Kubernetes CLI:::recommended:::kubectl version --client:::" >> .make/.make-deps; \
+			echo "${GREEN}✅ Created basic .make/.make-deps file${NC}"; \
+		fi \
+	fi
+
+.PHONY: utils utilities list-all list-subdirs list-ignored edit-ignore ignore-init list-marked deps-init deps-edit deps-show check-deps deps-update deps-install deps-list check-conflicts info graph validate-makefiles

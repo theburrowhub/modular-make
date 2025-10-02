@@ -1,32 +1,35 @@
 # Makefile System Dependencies
-# Format: command:description:required
-# required can be: required, optional, recommended
+# Format: command:::description:::level:::check_command:::install_command
+# Fields are separated by ::: to avoid conflicts
+# level can be: required, recommended, optional
+# check_command: Command to verify installation/version (optional, defaults to 'command --version')
+# install_command: Command to install/update the tool (optional, empty means manual install)
 # Lines starting with # are comments
 
 # Core tools
-make:GNU Make build tool:required
-git:Version control system:required
+make:::GNU Make build tool:::required:::make --version:::
+git:::Version control system:::required:::git --version:::
 
-# Docker tools  
-docker:Container runtime:required
-docker-compose:Multi-container orchestration:recommended
+# Docker tools
+docker:::Container runtime:::required:::docker --version:::
+docker-compose:::Multi-container orchestration:::recommended:::docker-compose --version:::
 
 # Kubernetes tools
-kubectl:Kubernetes CLI:required
-helm:Kubernetes package manager:optional
+kubectl:::Kubernetes CLI:::required:::kubectl version --client 2>/dev/null:::
+helm:::Kubernetes package manager:::optional:::helm version 2>/dev/null:::
 
 # Development tools
-curl:HTTP client for testing:recommended
-jq:JSON processor:optional
-yq:YAML processor:optional
-cherry-go:Cherry-go dependency manager:required
+curl:::HTTP client for testing:::recommended:::curl --version:::
+jq:::JSON processor:::optional:::jq --version:::brew install jq
+yq:::YAML processor:::optional:::yq --version:::brew install yq
+cherry-go:::Cherry-go dependency manager:::required:::cherry-go version 2>/dev/null:::
 
 # Language specific (add as needed)
-python3:Python runtime:optional
-node:Node.js runtime:optional
-go:Go programming language:optional
+python3:::Python runtime:::optional:::python3 --version:::
+node:::Node.js runtime:::optional:::node --version:::
+go:::Go programming language:::optional:::go version:::
 
 # CI/CD tools
-aws:AWS CLI:optional
-gcloud:Google Cloud CLI:optional
-az:Azure CLI:optional
+aws:::AWS CLI:::optional:::aws --version:::
+gcloud:::Google Cloud CLI:::optional:::gcloud --version:::
+az:::Azure CLI:::optional:::az --version:::
