@@ -23,7 +23,7 @@ BOLD_CYAN    := \033[1;36m
 BOLD_WHITE   := \033[1;37m
 
 # Reset Color
-NC := \033[0m  # No Color / Reset
+NC := \033[0m
 
 # Semantic Color Aliases (for consistent messaging)
 COLOR_SUCCESS := $(GREEN)
