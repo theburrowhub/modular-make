@@ -49,123 +49,123 @@ endif
 # Quick help without examples (default target)
 .PHONY: quick
 quick: ## Show quick help (without examples)
-	@echo "${CYAN}Project Makefile${NC}"
-	@echo ""
-	@echo "Usage: make [target] [VARIABLES]"
-	@echo ""
+	@printf "${CYAN}Project Makefile${NC}\n"
+	@printf "\n"
+	@printf "Usage: make [target] [VARIABLES]\n"
+	@printf "\n"
 	@# Show targets from main Makefile with section headers
 	@awk 'BEGIN {FS = ":.*##!?"; section=""} \
 		/^##@/ { section = substr($$0, 5); printf "\n${YELLOW}%s${NC}\n", section; next } \
 		/^[a-zA-Z_0-9-]+:.*?##[^!]/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' $(MAIN_MAKEFILE)
-	@echo ""
+	@printf "\n"
 	@# Automatically show marked targets from all subdirectory Makefiles
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ] && grep -q "##!" $$dir/Makefile 2>/dev/null; then \
 			dir_name=$$(echo $$dir | sed 's/[_-]/ /g' | awk '{for(i=1;i<=NF;i++) $$i=toupper(substr($$i,1,1)) tolower(substr($$i,2))}1'); \
-			echo "${YELLOW}$${dir_name} Operations:${NC}"; \
+			printf "${YELLOW}$${dir_name} Operations:${NC}\n"; \
 			awk 'BEGIN {FS = ":.*##!"} /^[a-zA-Z_0-9-]+:.*?##!/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' $$dir/Makefile; \
-			echo ""; \
+			printf "\n"; \
 		fi \
 	done
-	@echo "${CYAN}Tips:${NC}"
-	@echo "  ${CYAN}• Use 'make help' to see examples and full documentation${NC}"
-	@echo "  ${CYAN}• Use 'make utils' to see all system utilities${NC}"
-	@echo "  ${CYAN}• Use 'make list-all' to see all available targets${NC}"
+	@printf "${CYAN}Tips:${NC}\n"
+	@printf "  ${CYAN}• Use 'make help' to see examples and full documentation${NC}\n"
+	@printf "  ${CYAN}• Use 'make utils' to see all system utilities${NC}\n"
+	@printf "  ${CYAN}• Use 'make list-all' to see all available targets${NC}\n"
 
 # Full help with examples
 .PHONY: help
 help: ## Show full help with examples
-	@echo "${CYAN}Project Makefile${NC}"
-	@echo ""
-	@echo "Usage: make [target] [VARIABLES]"
-	@echo ""
+	@printf "${CYAN}Project Makefile${NC}\n"
+	@printf "\n"
+	@printf "Usage: make [target] [VARIABLES]\n"
+	@printf "\n"
 	@# Show targets from main Makefile with section headers
 	@awk 'BEGIN {FS = ":.*##!?"; section=""} \
 		/^##@/ { section = substr($$0, 5); printf "\n${YELLOW}%s${NC}\n", section; next } \
 		/^[a-zA-Z_0-9-]+:.*?##[^!]/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' $(MAIN_MAKEFILE)
-	@echo ""
+	@printf "\n"
 	@# Automatically show marked targets from all subdirectory Makefiles
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ] && grep -q "##!" $$dir/Makefile 2>/dev/null; then \
 			dir_name=$$(echo $$dir | sed 's/[_-]/ /g' | awk '{for(i=1;i<=NF;i++) $$i=toupper(substr($$i,1,1)) tolower(substr($$i,2))}1'); \
-			echo "${YELLOW}$${dir_name} Operations:${NC}"; \
+			printf "${YELLOW}$${dir_name} Operations:${NC}\n"; \
 			awk 'BEGIN {FS = ":.*##!"} /^[a-zA-Z_0-9-]+:.*?##!/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' $$dir/Makefile; \
-			echo ""; \
+			printf "\n"; \
 		fi \
 	done
 	@# Show utilities from internal.mk if present
 	@if [ -f .make/internal.mk ] && grep -q "##" .make/internal.mk 2>/dev/null; then \
-		echo "${YELLOW}System Utilities:${NC}"; \
+		printf "${YELLOW}System Utilities:${NC}\n"; \
 		awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_0-9-]+:.*?##[^!@]/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' .make/internal.mk | head -5; \
-		echo "  ${CYAN}... use 'make utils' to see all utilities${NC}"; \
+		printf "  ${CYAN}... use 'make utils' to see all utilities${NC}\n"; \
 		echo ""; \
 	fi
-	@echo "${YELLOW}Examples:${NC}"
-	@echo "${CYAN}Main Operations:${NC}"
-	@echo "  make all                   # Run complete pipeline"
-	@echo "  make clean-all             # Clean all resources"
-	@echo ""
+	@printf "${YELLOW}Examples:${NC}\n"
+	@printf "${CYAN}Main Operations:${NC}\n"
+	@printf "  make all                   # Run complete pipeline\n"
+	@printf "  make clean-all             # Clean all resources\n"
+	@printf "\n"
 	@# Display examples from each subdirectory Makefile
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ] && grep -q '##?' $$dir/Makefile 2>/dev/null; then \
 			dir_name=$$(echo $$dir | sed 's/[_-]/ /g' | awk '{for(i=1;i<=NF;i++) $$i=toupper(substr($$i,1,1)) tolower(substr($$i,2))}1'); \
-			echo "${CYAN}$${dir_name} Examples:${NC}"; \
+			printf "${CYAN}$${dir_name} Examples:${NC}\n"; \
 			awk '/##\? Examples:/,/^$$/ { if (/^# /) { sub(/^# /, "  "); print } }' $$dir/Makefile; \
-			echo ""; \
+			printf "\n"; \
 		fi \
 	done
-	@echo "${CYAN}Tips:${NC}"
-	@echo "  ${CYAN}• Use 'make utils' to see all system utilities${NC}"
-	@echo "  ${CYAN}• Use 'make list-all' to see all available targets${NC}"
+	@printf "${CYAN}Tips:${NC}\n"
+	@printf "  ${CYAN}• Use 'make utils' to see all system utilities${NC}\n"
+	@printf "  ${CYAN}• Use 'make list-all' to see all available targets${NC}\n"
 
 ##@ Main Operations
 
 self-update: ## Auto-update Makefile system using cherry-go
-	@echo "${CYAN}🔄 Syncing Makefile system with cherry-go...${NC}"
+	@printf "${CYAN}🔄 Syncing Makefile system with cherry-go...${NC}\n"
 	@cherry-go sync full-install
-	@echo "${GREEN}✅ Update completed!${NC}"
+	@printf "${GREEN}✅ Update completed!${NC}\n"
 
 self-cherry-add: ## Add cherry bunch configuration from repository
-	@echo "${CYAN}📦 Adding cherry bunch configuration...${NC}"
+	@printf "${CYAN}📦 Adding cherry bunch configuration...${NC}\n"
 	@cherry-go add cb https://raw.githubusercontent.com/theburrowhub/modular-make/refs/heads/main/full-install.cherrybunch
-	@echo "${GREEN}✅ Cherry bunch configuration added!${NC}"
+	@printf "${GREEN}✅ Cherry bunch configuration added!${NC}\n"
 
 all: ## Run all build and deploy steps
-	@echo "${BLUE}🚀 Running complete build and deploy pipeline...${NC}"
+	@printf "${BLUE}🚀 Running complete build and deploy pipeline...${NC}\n"
 	@# Try to run docker build if available
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ] && grep -q "^build:" $$dir/Makefile 2>/dev/null; then \
-			echo "Building in $$dir..."; \
+			printf "Building in $$dir...\n"; \
 			$(MAKE) -C $$dir build 2>/dev/null || true; \
 		fi \
 	done
 	@# Try to run deploy if available
-	@$(MAKE) deploy 2>/dev/null || echo "${YELLOW}Deploy target not available${NC}"
-	@echo "${GREEN}✅ Pipeline completed!${NC}"
+	@$(MAKE) deploy 2>/dev/null || printf "${YELLOW}Deploy target not available${NC}\n"
+	@printf "${GREEN}✅ Pipeline completed!${NC}\n"
 
 clean-all: ## Clean all generated files and resources
-	@echo "${RED}🧹 Cleaning all resources...${NC}"
+	@printf "${RED}🧹 Cleaning all resources...${NC}\n"
 	@# Run specific clean targets for each subdirectory
 	@if [ -f docker/Makefile ]; then \
-		echo "Cleaning Docker resources..."; \
+		printf "Cleaning Docker resources...\n"; \
 		$(MAKE) docker-clean 2>/dev/null || true; \
 	fi
 	@if [ -f doc/Makefile ]; then \
-		echo "Cleaning documentation..."; \
+		printf "Cleaning documentation...\n"; \
 		$(MAKE) doc-clean 2>/dev/null || true; \
 	fi
 	@# Check for other subdirectories with clean targets
 	@for dir in $(SUBDIRS); do \
 		if [ "$$dir" != "docker" ] && [ "$$dir" != "doc" ] && [ -f $$dir/Makefile ]; then \
 			if grep -q "^$$dir-clean:" $$dir/Makefile 2>/dev/null; then \
-				echo "Cleaning $$dir..."; \
+				printf "Cleaning $$dir...\n"; \
 				$(MAKE) $$dir-clean 2>/dev/null || true; \
 			elif grep -q "^clean:" $$dir/Makefile 2>/dev/null; then \
-				echo "Cleaning $$dir..."; \
+				printf "Cleaning $$dir...\n"; \
 				$(MAKE) -C $$dir clean 2>/dev/null || true; \
 			fi \
 		fi \
 	done
-	@echo "${GREEN}✅ Cleanup completed!${NC}"
+	@printf "${GREEN}✅ Cleanup completed!${NC}\n"
 
 .PHONY: quick help all clean-all self-update self-cherry-add

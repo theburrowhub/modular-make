@@ -18,51 +18,51 @@ KUBECONFIG ?= ~/.kube/config
 ##@ Core Operations
 
 deploy: ##! Deploy application to Kubernetes cluster
-	@echo "${BLUE}🚀 Deploying application to Kubernetes...${NC}"
-	@echo "  Cluster: ${GREEN}$(CLUSTER)${NC}"
-	@echo "  Namespace: ${GREEN}$(NAMESPACE)${NC}"
-	@echo "  Deployment: ${GREEN}$(DEPLOYMENT)${NC}"
-	@echo "  Image Tag: ${GREEN}$(IMAGE_TAG)${NC}"
-	@echo ""
-	@echo "${YELLOW}[kubectl apply -f kubernetes.yaml -n $(NAMESPACE)]${NC}"
-	@echo "${GREEN}✅ Deployment successful!${NC}"
+	@printf "${BLUE}🚀 Deploying application to Kubernetes...${NC}\n"
+	@printf "  Cluster: ${GREEN}$(CLUSTER)${NC}\n"
+	@printf "  Namespace: ${GREEN}$(NAMESPACE)${NC}\n"
+	@printf "  Deployment: ${GREEN}$(DEPLOYMENT)${NC}\n"
+	@printf "  Image Tag: ${GREEN}$(IMAGE_TAG)${NC}\n"
+	@printf "\n"
+	@printf "${YELLOW}[kubectl apply -f kubernetes.yaml -n $(NAMESPACE)]${NC}\n"
+	@printf "${GREEN}✅ Deployment successful!${NC}\n"
 
 rollback: ##! Rollback to previous deployment version
-	@echo "${YELLOW}⏪ Rolling back deployment...${NC}"
-	@echo "${YELLOW}[kubectl rollout undo deployment/$(DEPLOYMENT) -n $(NAMESPACE)]${NC}"
-	@echo "${GREEN}✅ Rollback completed!${NC}"
+	@printf "${YELLOW}⏪ Rolling back deployment...${NC}\n"
+	@printf "${YELLOW}[kubectl rollout undo deployment/$(DEPLOYMENT) -n $(NAMESPACE)]${NC}\n"
+	@printf "${GREEN}✅ Rollback completed!${NC}\n"
 
 delete: ## Delete Kubernetes deployment
-	@echo "${RED}🗑️  Deleting deployment...${NC}"
-	@echo "  Namespace: ${YELLOW}$(NAMESPACE)${NC}"
-	@echo "  Deployment: ${YELLOW}$(DEPLOYMENT)${NC}"
-	@echo ""
-	@echo "${YELLOW}[kubectl delete deployment $(DEPLOYMENT) -n $(NAMESPACE)]${NC}"
-	@echo "${GREEN}✅ Deployment deleted!${NC}"
+	@printf "${RED}🗑️  Deleting deployment...${NC}\n"
+	@printf "  Namespace: ${YELLOW}$(NAMESPACE)${NC}\n"
+	@printf "  Deployment: ${YELLOW}$(DEPLOYMENT)${NC}\n"
+	@printf "\n"
+	@printf "${YELLOW}[kubectl delete deployment $(DEPLOYMENT) -n $(NAMESPACE)]${NC}\n"
+	@printf "${GREEN}✅ Deployment deleted!${NC}\n"
 
 
 ##@ Monitoring
 
 status: ##! Check deployment status
-	@echo "${BLUE}📊 Checking deployment status...${NC}"
-	@echo "${YELLOW}[kubectl get deployment $(DEPLOYMENT) -n $(NAMESPACE)]${NC}"
-	@echo ""
-	@echo "${CYAN}Pod Status:${NC}"
-	@echo "${YELLOW}[kubectl get pods -l app=$(DEPLOYMENT) -n $(NAMESPACE)]${NC}"
-	@echo ""
-	@echo "${CYAN}Service Status:${NC}"
-	@echo "${YELLOW}[kubectl get svc -l app=$(DEPLOYMENT) -n $(NAMESPACE)]${NC}"
+	@printf "${BLUE}📊 Checking deployment status...${NC}\n"
+	@printf "${YELLOW}[kubectl get deployment $(DEPLOYMENT) -n $(NAMESPACE)]${NC}\n"
+	@printf "\n"
+	@printf "${CYAN}Pod Status:${NC}\n"
+	@printf "${YELLOW}[kubectl get pods -l app=$(DEPLOYMENT) -n $(NAMESPACE)]${NC}\n"
+	@printf "\n"
+	@printf "${CYAN}Service Status:${NC}\n"
+	@printf "${YELLOW}[kubectl get svc -l app=$(DEPLOYMENT) -n $(NAMESPACE)]${NC}\n"
 
 logs: ## View pod logs
-	@echo "${BLUE}📜 Fetching logs...${NC}"
-	@echo "${YELLOW}[kubectl logs -f deployment/$(DEPLOYMENT) -n $(NAMESPACE)]${NC}"
-	@echo "${CYAN}Streaming logs... (Press Ctrl+C to stop)${NC}"
+	@printf "${BLUE}📜 Fetching logs...${NC}\n"
+	@printf "${YELLOW}[kubectl logs -f deployment/$(DEPLOYMENT) -n $(NAMESPACE)]${NC}\n"
+	@printf "${CYAN}Streaming logs... (Press Ctrl+C to stop)${NC}\n"
 
 ##@ Validation
 
 validate: ## Validate Kubernetes manifests
-	@echo "${BLUE}✔️  Validating manifests...${NC}"
-	@echo "${YELLOW}[kubectl apply -f kubernetes.yaml --validate=true --dry-run=client]${NC}"
-	@echo "${GREEN}✅ Manifests are valid!${NC}"
+	@printf "${BLUE}✔️  Validating manifests...${NC}\n"
+	@printf "${YELLOW}[kubectl apply -f kubernetes.yaml --validate=true --dry-run=client]${NC}\n"
+	@printf "${GREEN}✅ Manifests are valid!${NC}\n"
 
 .PHONY: deploy rollback delete status logs validate

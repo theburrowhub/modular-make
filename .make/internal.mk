@@ -6,29 +6,29 @@
 ##@ Makefile System Utilities
 
 utils: ## Show all system utilities
-	@echo "${CYAN}System Utilities Available:${NC}"
-	@echo ""
+	@printf "${CYAN}System Utilities Available:${NC}\n"
+	@printf "\n"
 	@awk 'BEGIN {FS = ":.*##"; section=""} \
 		/^##@/ { section = substr($$0, 5); printf "\n${YELLOW}%s:${NC}\n", section; next } \
 		/^[a-zA-Z_0-9-]+:.*?##/ { printf "  ${GREEN}%-25s${NC} %s\n", $$1, $$2 }' .make/internal.mk
-	@echo ""
-	@echo "${CYAN}Quick Access:${NC}"
-	@echo "  ${GREEN}make check-deps${NC}   - Check all dependencies status"
-	@echo "  ${GREEN}make deps-update${NC}  - Auto-install missing dependencies"
-	@echo "  ${GREEN}make deps-list${NC}    - List all dependencies"
-	@echo ""
-	@echo "${CYAN}Use any of these utilities directly, e.g., 'make info'${NC}"
+	@printf "\n"
+	@printf "${CYAN}Quick Access:${NC}\n"
+	@printf "  ${GREEN}make check-deps${NC}   - Check all dependencies status\n"
+	@printf "  ${GREEN}make deps-update${NC}  - Auto-install missing dependencies\n"
+	@printf "  ${GREEN}make deps-list${NC}    - List all dependencies\n"
+	@printf "\n"
+	@printf "${CYAN}Use any of these utilities directly, e.g., 'make info'${NC}\n"
 
 utilities: utils ## Alias for utils
 
 list-all: ## List all available targets from all Makefiles
-	@echo "${CYAN}All available targets:${NC}"
-	@echo ""
-	@echo "${YELLOW}From main Makefile:${NC}"
+	@printf "${CYAN}All available targets:${NC}\n"
+	@printf "\n"
+	@printf "${YELLOW}From main Makefile:${NC}\n"
 	@awk 'BEGIN {FS = ":.*##!?"; section=""} \
 		/^##@/ { section = substr($$0, 5); printf "\n  ${CYAN}%s:${NC}\n", section; next } \
 		/^[a-zA-Z_0-9-]+:.*?##/ { printf "    ${GREEN}%-23s${NC} %s\n", $$1, $$2 }' $(MAIN_MAKEFILE)
-	@echo ""
+	@printf "\n"
 	@# List targets from all subdirectory Makefiles
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ]; then \
@@ -44,16 +44,16 @@ list-all: ## List all available targets from all Makefiles
 	done
 
 list-subdirs: ## List all discovered subdirectories with Makefiles
-	@echo "${CYAN}Discovered Makefiles in:${NC}"
+	@printf "${CYAN}Discovered Makefiles in:${NC}\n"
 	@for dir in $(SUBDIRS); do \
 		echo "  ${GREEN}$$dir/${NC}"; \
 	done
-	@echo ""
-	@echo "${YELLOW}Total: $$(echo '$(SUBDIRS)' | wc -w) subdirectories${NC}"
+	@printf "\n"
+	@printf "${YELLOW}Total: $$(echo '$(SUBDIRS)' | wc -w) subdirectories${NC}\n"
 
 list-ignored: ## Show directories being ignored by .makeignore
-	@echo "${CYAN}Ignored Directories (.make/.makeignore):${NC}"
-	@echo ""
+	@printf "${CYAN}Ignored Directories (.make/.makeignore):${NC}\n"
+	@printf "\n"
 	@if [ -f .make/.makeignore ]; then \
 		echo "${YELLOW}Patterns in .makeignore:${NC}"; \
 		grep -v '^\#' .make/.makeignore | sed 's/\#.*$$//g' | grep -v '^$$' | sed 's/^[[:space:]]*//;s/[[:space:]]*$$//' | while read pattern; do \
@@ -122,8 +122,8 @@ ignore-init: ## Initialize .makeignore from example file
 	fi
 
 list-marked: ## List only marked targets from all Makefiles
-	@echo "${CYAN}Marked targets across all Makefiles:${NC}"
-	@echo ""
+	@printf "${CYAN}Marked targets across all Makefiles:${NC}\n"
+	@printf "\n"
 	@# Check main Makefile for marked targets
 	@if grep -q "##!" $(MAIN_MAKEFILE) 2>/dev/null; then \
 		echo "${YELLOW}From main Makefile:${NC}"; \
@@ -140,8 +140,8 @@ list-marked: ## List only marked targets from all Makefiles
 	done
 
 check-conflicts: ## Check for target name conflicts across Makefiles
-	@echo "${BLUE}🔍 Checking for target conflicts...${NC}"
-	@echo ""
+	@printf "${BLUE}🔍 Checking for target conflicts...${NC}\n"
+	@printf "\n"
 	@# Collect all targets and find duplicates
 	@{ \
 		awk -F: '/^[a-zA-Z_0-9-]+:/ {print $$1 " main"}' $(MAIN_MAKEFILE); \
@@ -169,14 +169,14 @@ check-conflicts: ## Check for target name conflicts across Makefiles
 	}'
 
 info: ## Show Makefile system information
-	@echo "${CYAN}Makefile System Information${NC}"
-	@echo ""
-	@echo "${YELLOW}Configuration:${NC}"
-	@echo "  Main Makefile: $(MAIN_MAKEFILE)"
-	@echo "  Subdirectories: $(SUBDIRS)"
-	@echo "  Total Makefiles: $$(echo '$(SUBDIRS)' | wc -w | xargs expr 1 +)"
-	@echo ""
-	@echo "${YELLOW}Statistics:${NC}"
+	@printf "${CYAN}Makefile System Information${NC}\n"
+	@printf "\n"
+	@printf "${YELLOW}Configuration:${NC}\n"
+	@printf "  Main Makefile: $(MAIN_MAKEFILE)\n"
+	@printf "  Subdirectories: $(SUBDIRS)\n"
+	@printf "  Total Makefiles: $$(echo '$(SUBDIRS)' | wc -w | xargs expr 1 +)\n"
+	@printf "\n"
+	@printf "${YELLOW}Statistics:${NC}\n"
 	@printf "  Total targets in main: "
 	@grep -c "^[a-zA-Z_0-9-].*:.*##" $(MAIN_MAKEFILE) 2>/dev/null || echo "0"
 	@for dir in $(SUBDIRS); do \
@@ -185,7 +185,7 @@ info: ## Show Makefile system information
 			echo "  Total targets in $$dir: $$count"; \
 		fi \
 	done
-	@echo ""
+	@printf "\n"
 	@printf "  Total marked targets: "
 	@{ grep -c "##!" $(MAIN_MAKEFILE) 2>/dev/null || echo "0"; \
 	   for dir in $(SUBDIRS); do \
@@ -193,13 +193,13 @@ info: ## Show Makefile system information
 	   done; } | awk '{sum += $$1} END {print sum}'
 
 graph: ## Show target dependency graph (dynamically generated)
-	@echo "${CYAN}Makefile System Structure:${NC}"
-	@echo ""
-	@echo "${YELLOW}Main Orchestration (Makefile):${NC}"
+	@printf "${CYAN}Makefile System Structure:${NC}\n"
+	@printf "\n"
+	@printf "${YELLOW}Main Orchestration (Makefile):${NC}\n"
 	@printf "  ├── all ${GREEN}(orchestrates build pipeline)${NC}\n"
 	@printf "  └── clean-all ${GREEN}(orchestrates cleanup)${NC}\n"
-	@echo ""
-	@echo "${YELLOW}Subdirectory Targets:${NC}"
+	@printf "\n"
+	@printf "${YELLOW}Subdirectory Targets:${NC}\n"
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ]; then \
 			echo ""; \
@@ -214,9 +214,9 @@ graph: ## Show target dependency graph (dynamically generated)
 				sed '$$s/├/└/'; \
 		fi \
 	done
-	@echo ""
-	@echo "${YELLOW}Cross-Makefile Dependencies:${NC}"
-	@echo "  clean-all ${CYAN}(calls)${NC}"
+	@printf "\n"
+	@printf "${YELLOW}Cross-Makefile Dependencies:${NC}\n"
+	@printf "  clean-all ${CYAN}(calls)${NC}\n"
 	@first=1; \
 	for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ]; then \
@@ -232,8 +232,8 @@ graph: ## Show target dependency graph (dynamically generated)
 			fi; \
 		fi \
 	done | sed '$$s/├/└/'
-	@echo ""
-	@echo "${YELLOW}Important Targets (shown in main help):${NC}"
+	@printf "\n"
+	@printf "${YELLOW}Important Targets (shown in main help):${NC}\n"
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ]; then \
 			marked=$$(grep "##!" $$dir/Makefile | awk -F':' '{print $$1}' | tr '\n' ' '); \
@@ -242,15 +242,15 @@ graph: ## Show target dependency graph (dynamically generated)
 			fi; \
 		fi \
 	done
-	@echo ""
-	@echo "${YELLOW}Makefiles with Examples:${NC}"
+	@printf "\n"
+	@printf "${YELLOW}Makefiles with Examples:${NC}\n"
 	@for dir in $(SUBDIRS); do \
 		if [ -f $$dir/Makefile ] && grep -q "##?" $$dir/Makefile 2>/dev/null; then \
 			printf "  ${GREEN}✓${NC} $$dir\n"; \
 		fi \
 	done
-	@echo ""
-	@echo "${YELLOW}Target Counts:${NC}"
+	@printf "\n"
+	@printf "${YELLOW}Target Counts:${NC}\n"
 	@total=0; \
 	for dir in . $(SUBDIRS); do \
 		if [ "$$dir" = "." ]; then \
@@ -272,7 +272,7 @@ graph: ## Show target dependency graph (dynamically generated)
 ##@ Makefile Maintenance
 
 validate-makefiles: ## Validate syntax of all Makefiles
-	@echo "${BLUE}✔️ Validating Makefile syntax...${NC}"
+	@printf "${BLUE}✔️ Validating Makefile syntax...${NC}\n"
 	@error=0; \
 	for file in $(MAIN_MAKEFILE) $(addsuffix /Makefile,$(SUBDIRS)); do \
 		if [ -f $$file ]; then \
@@ -289,8 +289,8 @@ validate-makefiles: ## Validate syntax of all Makefiles
 ##@ Dependencies and Tools Management
 
 check-deps: ## Check all dependencies and show installation status
-	@echo "${BLUE}🔍 Checking dependencies...${NC}"
-	@echo ""
+	@printf "${BLUE}🔍 Checking dependencies...${NC}\n"
+	@printf "\n"
 	@if [ ! -f .make/.make-deps ]; then \
 		echo "${YELLOW}⚠️  Dependencies file '.make/.make-deps' not found${NC}"; \
 		exit 1; \
@@ -392,8 +392,8 @@ check-deps: ## Check all dependencies and show installation status
 	}
 
 deps-update: ## Auto-install/update all installable dependencies
-	@echo "${CYAN}🔧 Installing/updating dependencies with available installers...${NC}"
-	@echo ""
+	@printf "${CYAN}🔧 Installing/updating dependencies with available installers...${NC}\n"
+	@printf "\n"
 	@if [ ! -f .make/.make-deps ]; then \
 		echo "${YELLOW}⚠️  Dependencies file '.make/.make-deps' not found${NC}"; \
 		exit 1; \
@@ -452,7 +452,7 @@ deps-install: ## Install a specific dependency (use TOOL=name)
 		done; \
 		exit 1; \
 	fi
-	@echo "${CYAN}🔧 Installing $(TOOL)...${NC}"
+	@printf "${CYAN}🔧 Installing $(TOOL)...${NC}\n"
 	@found=0; \
 	grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
 		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
@@ -500,8 +500,8 @@ deps-install: ## Install a specific dependency (use TOOL=name)
 	}
 
 deps-list: ## List all dependencies with installation capability
-	@echo "${CYAN}All Dependencies:${NC}"
-	@echo ""
+	@printf "${CYAN}All Dependencies:${NC}\n"
+	@printf "\n"
 	@grep -v '^#' .make/.make-deps | grep -v '^$$' | while IFS= read -r line; do \
 		cmd=$$(echo "$$line" | awk -F':::' '{print $$1}'); \
 		desc=$$(echo "$$line" | awk -F':::' '{print $$2}'); \
@@ -518,18 +518,18 @@ deps-list: ## List all dependencies with installation capability
 			fi; \
 		fi; \
 	done
-	@echo ""
-	@echo "${CYAN}Legend:${NC}"
-	@echo "  ${GREEN}✓${NC} = installed"
-	@echo "  ${YELLOW}○${NC} = can be installed with 'make deps-install TOOL=name'"
-	@echo "  ${CYAN}○${NC} = requires manual installation"
+	@printf "\n"
+	@printf "${CYAN}Legend:${NC}\n"
+	@printf "  ${GREEN}✓${NC} = installed\n"
+	@printf "  ${YELLOW}○${NC} = can be installed with 'make deps-install TOOL=name'\n"
+	@printf "  ${CYAN}○${NC} = requires manual installation\n"
 
 deps-edit: ## Edit the dependencies configuration file
 	@$${EDITOR:-vi} .make/.make-deps
 
 deps-show: ## Show the raw dependencies configuration
-	@echo "${CYAN}Dependencies Configuration (.make/.make-deps):${NC}"
-	@echo ""
+	@printf "${CYAN}Dependencies Configuration (.make/.make-deps):${NC}\n"
+	@printf "\n"
 	@if [ -f .make/.make-deps ]; then \
 		cat .make/.make-deps | while IFS= read -r line; do \
 			if [ -z "$$line" ]; then \
